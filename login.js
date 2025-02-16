@@ -1,21 +1,25 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM Content Loaded");
+    
     const loginForm = document.getElementById("loginForm");
     const createAccountForm = document.getElementById("createAccountForm");
 
-    // Handle Login Form submission
+    // ✅ Handle Login Form Submission
     loginForm.addEventListener("submit", async function (event) {
-        event.preventDefault(); // Prevent form from reloading the page
+        event.preventDefault(); // Prevent form reload
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email || !password) {
+            alert("Please fill in both fields.");
+            return;
+        }
 
         try {
-            const response = await fetch("http://localhost:3000/login", {  // Adjust the URL if necessary
+            const response = await fetch("http://localhost:3000/login", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password })
             });
 
@@ -23,97 +27,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (response.ok) {
                 alert("Login successful!");
-                window.location.href = "dashboard.html"; 
+                window.location.href = "landingpage.html"; // ✅ Redirect to dashboard
             } else {
-                alert("Error: " + data.error);
+                alert("Error: " + (data.error || "Invalid credentials"));
             }
         } catch (error) {
-            console.error("Error:", error);
-            alert("Something went wrong. Try again later.");
+            console.error("Error during login:", error);
+            alert("Something went wrong. Please try again later.");
         }
     });
 
-    // Handle Create Account Form submission
+    // ✅ Handle Create Account Form Submission
     createAccountForm.addEventListener("submit", async function (event) {
-        event.preventDefault(); // Prevent form from reloading the page
+        event.preventDefault(); // Prevent form reload
 
-        const firstName = document.getElementById("firstName").value;
-        const lastName = document.getElementById("lastName").value;
-        const city = document.getElementById("city").value;
-        const state = document.getElementById("state").value;
-        const email = document.getElementById("modalEmail").value; // Make sure this is captured from the modal too
-        const password = document.getElementById("newPassword").value;
+        const firstName = document.getElementById("firstName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+        const city = document.getElementById("city").value.trim();
+        const state = document.getElementById("state").value.trim();
+        const email = document.getElementById("modalEmail").value.trim(); // Ensure correct field
+        const password = document.getElementById("newPassword").value.trim();
 
-        console.log('Captured email:', email)
+        if (!firstName || !lastName || !city || !state || !email || !password) {
+            alert("All fields are required.");
+            return;
+        }
 
         try {
-            const response = await fetch("http://localhost:3000/register", {  // Adjust the URL if necessary
+            const response = await fetch("http://localhost:3000/register", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ firstName, lastName, city, state, email, password })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                alert("Account created successfully!");
-                window.location.href = "login.html"; // Redirect to login page
+                alert("Account created successfully! Redirecting to login...");
+                window.location.href = "login.html"; // ✅ Redirect to login page
             } else {
-                alert("Error: " + data.error);
+                alert("Error: " + (data.error || "Account creation failed"));
             }
         } catch (error) {
-            console.error("Error:", error);
-            alert("Something went wrong. Try again later.");
+            console.error("Error during account creation:", error);
+            alert("Something went wrong. Please try again later.");
         }
     });
 });
-
-// Login Validation 
-
-document.getElementById("loginForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent default form submission
-
-    // Get the email and password from the form
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    // Basic client-side validation (you can expand this)
-    if (!email || !password) {
-        alert("Please fill in both fields.");
-        return;
-    }
-
-    // Log the captured values for debugging
-    console.log("Captured email:", email);
-    console.log("Captured password:", password);
-
-    // Send the data to the server for validation
-    fetch("/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: email,
-            password: password
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Handle server response (login success or failure)
-        if (data.success) {
-            alert("Login successful!");
-            // Redirect user to the dashboard or home page, etc.
-            window.location.href = "/dashboard"; // Example
-        } else {
-            alert("Invalid email or password. Please try again.");
-        }
-    })
-    .catch(error => {
-        console.error("Error during login:", error);
-        alert("There was an error with the login request.");
-    });
-});
-
